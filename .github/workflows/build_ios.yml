@@ -4,10 +4,11 @@
 # （免费账号 7 天有效期、仅前台安装）；持开发者账号的正式签名走本地
 # `python scripts/build_ios.py --export-options <ExportOptions.plist>`。
 #
-# PUB_HOSTED_URL 必须显式对齐 pub.flutter-io.cn：pubspec.lock 记录的
-# hosted url 全部是镜像源，pub 对 lockfile 的 URL 敏感（构建脚本内部
-# `flutter pub get --enforce-lockfile`），不设置时 CI 默认 pub.dev，
-# 会报 "Would change N dependencies" 失败。
+# 注意：本 workflow 不要设置 PUB_HOSTED_URL 镜像。assets 分支的
+# pubspec.lock hosted url 已全部是 https://pub.dev，pub 对 lockfile
+# 的 URL 敏感（构建脚本内部 `flutter pub get --enforce-lockfile`），
+# 注入镜像会报 "Would change 127 dependencies"（ci1 首跑失败实录）。
+# 海外 runner 直连 pub.dev 反而最快。
 name: build-ios
 
 on:
@@ -25,8 +26,6 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: write
-    env:
-      PUB_HOSTED_URL: https://pub.flutter-io.cn
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
